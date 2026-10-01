@@ -9,7 +9,7 @@ description: A near-real-time outbound feed of changes in Kaizen, delivered to y
 
 We expose a near-real-time outbound data feed over webhooks. When things change in Kaizen (e.g. a customer is updated), we send a signed HTTP POST to your webhook URL containing a standard envelope (metadata about the event) and the payload (the object itself).
 
-Initially, we're focusing on the customer object type, with more objects added over time.
+Four object types are available: `customer`, `order`, `product` and `tagType` (see [Object Schemas](#object-schemas)). You receive the ones configured for your integration.
 
 ## Getting Started
 
@@ -56,9 +56,8 @@ Every POST you receive will be a JSON envelope with a consistent shape, wrapping
   "organisationId": "00000000-0000-0000-0001-000000000004",
   "objectType": "customer",
   "objectVersion": 1,
-  "objectId": "12345",
+  "objectId": "accnt_6f1c2a9e-3b7d-4e2a-9c41-0d8b5e7f2a13",
   "idempotencyKey": "…hash…",
-  "correlationId": "…guid…",
   "sourceSystem": "Kaizen",
   "payload": {}
 }
@@ -75,9 +74,8 @@ Every POST you receive will be a JSON envelope with a consistent shape, wrapping
 * `organisationId` - The unique identifier of the Kaizen organisation (club) this event belongs to. Use this value to route each message to the correct tenant in your system
 * `objectType` - The type of object (e.g. customer). This determines the schema of the payload
 * `objectVersion` - Version number of the object schema in the payload. Increments when we make changes to the object structure. Use this to handle different payload versions
-* `objectId` - The unique identifier of the specific object within Kaizen (e.g. the customer ID)
+* `objectId` - The unique identifier of the specific object within Kaizen, prefixed by its kind (e.g. `accnt_…` for a customer's account ID, `order_…` for an order)
 * `idempotencyKey` - A unique hash for this specific event. Use this to deduplicate if you receive the same event multiple times (see Idempotency)
-* `correlationId` - A unique identifier for tracing this event through your systems
 * `sourceSystem` - Always Kaizen
 * `payload` - The actual object data. For update events, this is the full payload each time, not just changed fields
 
@@ -89,6 +87,8 @@ Each webhook POST will include the following headers:
 * **X-Kaizen-Source** – Always Kaizen
 * **X-Idempotency-Key** – mirrors idempotencyKey in the envelope
 * **X-Kaizen-Signature** – HMAC-SHA256 (hex) of the raw request body, computed with the shared secret. NOTE: The value is prefixed with sha256= (e.g., sha256=a2b14dabsdw) **You must verify this to ensure authenticity**
+* **traceparent** – The [W3C Trace Context](https://www.w3.org/TR/trace-context/) of the change inside Kaizen. Its trace ID is the same on every retry of a change, so quote it to us when you need us to trace a delivery. One change in Kaizen can publish several events with the same trace ID, so deduplicate with `idempotencyKey`, not the trace ID
+* **tracestate** – Sent alongside `traceparent` when Kaizen has trace state to pass on
 
 ## Retry / resilience behaviour
 
@@ -104,24 +104,23 @@ Kaizen provides **at-least-once delivery**. This means:
 When we send a webhook to your endpoint:
 
 * **2xx response** → Success. We consider the event delivered and will not retry
-* **5xx response or network error** → Temporary failure. We will retry the delivery with exponential backoff
-* **4xx response** → Client error. We log this and generally do not retry (as it indicates a problem with the webhook endpoint or configuration)
+* **5xx response, 408, 429, a timeout or a network error** → Temporary failure. We retry the delivery with exponential backoff (see below)
+* **Any other 4xx response** → Client error. We log it and do not retry, as it indicates a problem with the request or your endpoint's configuration (for example a signature you could not verify). That event is not redelivered automatically
 
 ### Retry schedule
 
-Our retry behavior includes:
-
-* Exponential backoff between retry attempts
-* Multiple retry attempts over time
-* After exhausting retries, failed events may be sent to a dead letter queue for investigation
+* The first retry follows after about 10 seconds, and the wait doubles with each attempt up to a maximum of 10 minutes between attempts
+* We keep retrying until the event is delivered, or until it is 7 days old (see [Retention Period](#retention-period))
+* There is no dead letter queue - an event is either retried or, after 7 days, discarded
+* An event that keeps failing for more than a few minutes is reported on our side, so we can see a stuck integration
 
 ## Retention Period
 
-Webhook events and retry attempts are retained for **at least 7 days**. After this period:
+Undelivered events are retained and retried for **7 days** from when they were published. After this period:
 
-* Failed deliveries that have exhausted retries will be moved to a dead letter queue
+* An event that has still not been delivered is discarded
 * We do not guarantee redelivery of events older than 7 days
-* **If your webhook is offline for an extended period:** During the 7-day retry window, you won't miss anything as failed deliveries are retried automatically. Beyond the retention period, we can manually replay data by republishing from our side. Coordinate with us to discuss backfilling options if needed
+* **If your webhook is offline for an extended period:** During the 7-day window, you won't miss anything as failed deliveries are retried automatically. Beyond it, we can replay data by republishing from our side. Coordinate with us to discuss backfilling options if needed
 
 ### Idempotency on your side
 
