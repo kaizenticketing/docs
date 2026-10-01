@@ -32,8 +32,9 @@ The simplest approach, and the one we would suggest starting with, is Google's `
 # sign in once, using the key file we sent you
 gcloud auth activate-service-account --key-file=your-key-file.json
 
-# see what is waiting for you
-gcloud storage objects list gs://ticketing-prod-247511_integrations/00000000-0000-0000-0000-000000000001/your-name/
+# see what is waiting for you - use `ls` here: `gcloud storage objects list` treats a
+# folder URL as an exact object name and silently prints nothing
+gcloud storage ls gs://ticketing-prod-247511_integrations/00000000-0000-0000-0000-000000000001/your-name/
 
 # take a copy
 gcloud storage cp gs://ticketing-prod-247511_integrations/.../your-name/barcodes_MATCH123_20260618.csv ./
