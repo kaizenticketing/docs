@@ -16,6 +16,12 @@ export default defineConfig({
 			favicon: "/favicon.png",
 			customCss: ["./src/styles/custom.css"],
 			head: [
+				// starlight sets twitter:card to summary_large_image but ships no image,
+				// so link unfurls in Slack and elsewhere come out bare without these
+				{ tag: "meta", attrs: { property: "og:image", content: "https://docs.ktckts.com/og-image.png" } },
+				{ tag: "meta", attrs: { property: "og:image:width", content: "1200" } },
+				{ tag: "meta", attrs: { property: "og:image:height", content: "630" } },
+				{ tag: "meta", attrs: { name: "twitter:image", content: "https://docs.ktckts.com/og-image.png" } },
 				{ tag: "link", attrs: { rel: "preconnect", href: "https://fonts.googleapis.com" } },
 				{ tag: "link", attrs: { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: true } },
 				{
