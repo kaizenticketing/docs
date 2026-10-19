@@ -36,11 +36,13 @@ To consume the feed effectively, please ensure the following technical requireme
 
 * Accepts POST requests
 * Requires Content-Type: application/json
+* Tolerates null fields.
 * **Verifies X-Kaizen-Signature using HMAC SHA-256** over the raw body + shared secret (see [Security](#security-and-shared-secret) section below)
 * **Returns a quick 2xx response** (ideally within 3 seconds):
   * This should be a fast acknowledgment that you've received the webhook
   * If you need to perform heavy processing (database writes, API calls, business logic), **queue the work asynchronously** on your side and return 2xx immediately
   * Slow responses may trigger timeouts and unnecessary retries
+* Returns 5xx, not 4xx, when your own processing fails 
 
 All routing (which organisations + object types you receive) is configured by us.
 
@@ -67,17 +69,23 @@ Every POST you receive will be a JSON envelope with a consistent shape, wrapping
 
 * `envelopeVersion` - Version of the envelope schema (currently 1). This may increment if we make breaking changes to the envelope structure
 * `publishedAt` - Timestamp of when the event was published by Kaizen (UTC, ISO 8601)
-* `eventType` - The type of change that occurred:
-  * `Created` - A new object was created
-  * `Updated` - An existing object was modified
-  * `Deleted` - Deleted events correspond to a hard deletion inside Kaizen. After a Deleted event for a given objectId, that object no longer exists in Kaizen. The payload for a Deleted event contains the last known state of the object at the time it was deleted.
+* `eventType` — The type of change that occurred: Created, Updated or Deleted.
 * `organisationId` - The unique identifier of the Kaizen organisation (club) this event belongs to. Use this value to route each message to the correct tenant in your system
 * `objectType` - The type of object (e.g. customer). This determines the schema of the payload
 * `objectVersion` - Version number of the object schema in the payload. Increments when we make changes to the object structure. Use this to handle different payload versions
 * `objectId` - The unique identifier of the specific object within Kaizen, prefixed by its kind (e.g. `accnt_…` for a customer's account ID, `order_…` for an order)
-* `idempotencyKey` - A unique hash for this specific event. Use this to deduplicate if you receive the same event multiple times (see Idempotency)
+* `idempotencyKey` - A unique hash for this specific event. Use this to deduplicate if you receive the same event multiple times (see [Idempotency](idempotency-on-your-side)
 * `sourceSystem` - Always Kaizen
-* `payload` - The actual object data. For update events, this is the full payload each time, not just changed fields
+* `payload` - The actual object data. For `Updated` and `Created` events, this is the full payload each time, not just changed fields
+
+### Deleted events
+
+A `Deleted` event means the object has been erased in Kaizen. After a `Deleted` event, that object no longer exists.
+
+Two things differ from other events:
+
+- **The payload is blank.** An erasure destroys the record's contents, so the payload carries identifiers only — `accountId`, `profileId`, `organisationId`, `originId` and `reference`. Every other field is null.
+- **The account ID is one you have not seen.** The erasure assigns the account a new ID before the event is published, so `objectId` and `accountId` are new values. The `profileId` is unchanged, so match on `organisationId` + `profileId`.
 
 ## Headers & authentication
 
@@ -89,6 +97,21 @@ Each webhook POST will include the following headers:
 * **X-Kaizen-Signature** – HMAC-SHA256 (hex) of the raw request body, computed with the shared secret. NOTE: The value is prefixed with sha256= (e.g., sha256=a2b14dabsdw) **You must verify this to ensure authenticity**
 * **traceparent** – The [W3C Trace Context](https://www.w3.org/TR/trace-context/) of the change inside Kaizen. Its trace ID is the same on every retry of a change, so quote it to us when you need us to trace a delivery. One change in Kaizen can publish several events with the same trace ID, so deduplicate with `idempotencyKey`, not the trace ID
 * **tracestate** – Sent alongside `traceparent` when Kaizen has trace state to pass on
+
+## Responding to webhooks
+
+The status code you return decides whether a failed event is retried or destroyed.
+
+| You want to say | Return | What we do |
+| --- | --- | --- |
+| Received, will process | 2xx | Nothing further. Event is delivered |
+| Processing failed | 5xx | Retry with backoff for up to 7 days |
+| Temporarily overloaded | 429 or 503 | Retry with backoff for up to 7 days |
+| Signature did not verify | 4xx | Log it. Event is discarded permanently |
+
+Return 4xx only when you verified the signature and it did not match. A 4xx is permanent: the event is discarded, there is no dead letter queue, and nothing alerts you. Recovering it needs a republish from us, and only within the retention period (see [Retention Period](#retention-period)).
+
+Return 5xx for every other failure.
 
 ## Retry / resilience behaviour
 
@@ -122,7 +145,7 @@ Undelivered events are retained and retried for **7 days** from when they were p
 * We do not guarantee redelivery of events older than 7 days
 * **If your webhook is offline for an extended period:** During the 7-day window, you won't miss anything as failed deliveries are retried automatically. Beyond it, we can replay data by republishing from our side. Coordinate with us to discuss backfilling options if needed
 
-### Idempotency on your side
+## Idempotency on your side
 
 Because of our **at-least-once delivery** guarantee, you may receive the same event multiple times. Additionally, **events may arrive out of order** due to retries and network conditions.
 
@@ -136,8 +159,11 @@ Because of our **at-least-once delivery** guarantee, you may receive the same ev
 
 **Retention of idempotency keys:** You only need to retain idempotencyKey values for as long as retries are possible (at least 7 days - see [Retention Period](#retention-period)). After that, the risk of receiving duplicates is negligible.
 
-### Handling out-of-order delivery 
-Because events can be retried and replayed, you may ocassionally recieve an older event after you've already processed a more recent one for the same object. To guard against overwriting newer data with a stale update, compare the incoming **publishedAt** timestamp against the **publishedAt** value you have stored for that **objectId**. If the incoming event is older, discard it and return 200. 
+## Handling out-of-order delivery
+
+Because events can be retried and replayed, you may occasionally receive an older event after you've already processed a more recent one for the same record. To guard against overwriting newer data with a stale update, compare the incoming **publishedAt** timestamp against the **publishedAt** value you have stored for that record. If the incoming event is older, discard it and return 200.
+
+Key this check on `organisationId` + `profileId` for customers, not `objectId`, because a `Deleted` event arrives with a new `objectId`.
 
 
 ## Security and Shared Secret
@@ -184,8 +210,8 @@ For objectType: "customer"
 
 **Key fields:**
 
-* **accountId:** Primary key. Shared between clubs if the same email address is used
-* **profileId:** Unique per club
+* **accountId:** Primary key. Shared between clubs if the same email address is used. Not stable across an erasure, so don't use it as your key
+* **profileId:** Unique per club, not globally unique. Match customers on `organisationId` + `profileId`
 * **organisationId:** The ID of the owning club the record belongs to
 * **foreignOrganisationId:** Used when a profile has been generated through Kaizen Network
 * **Phone numbers:** Not verified; free text field
