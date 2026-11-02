@@ -1,9 +1,12 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import { writeApiReference } from "./scripts/api-reference.mjs";
 
 export default defineConfig({
 	site: "https://docs.ktckts.com",
 	integrations: [
+		// the Management API reference is generated from schema/management.json before starlight reads the pages
+		{ name: "api-reference", hooks: { "astro:config:setup": () => writeApiReference() } },
 		starlight({
 			title: "Kaizen Ticketing",
 			description: "Guides for partners who integrate with the Kaizen Ticketing platform.",
@@ -35,6 +38,15 @@ export default defineConfig({
 			sidebar: [
 				{ label: "Datafeeds", link: "/datafeeds/" },
 				{ label: "Scheduled Exports", link: "/scheduled-exports/" },
+				{
+					label: "Management API",
+					items: [
+						{ label: "Overview", link: "/management-api/" },
+						{ label: "kz", link: "/kz/" },
+						{ label: "Groups", items: [{ autogenerate: { directory: "management-api/groups" } }] },
+						{ label: "Types", collapsed: true, items: [{ autogenerate: { directory: "management-api/types" } }] },
+					],
+				},
 			],
 		}),
 	],

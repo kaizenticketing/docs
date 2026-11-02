@@ -2,3 +2,5 @@ node_modules
 dist
 .astro
 _site
+# generated from schema/management.json by scripts/api-reference.mjs
+src/content/docs/management-api
