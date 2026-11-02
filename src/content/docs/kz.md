@@ -3,7 +3,7 @@ title: kz
 description: The Management API as commands - install it, sign in, and read and change your data from a terminal or a script.
 ---
 
-kz is the [Management API](/management-api/) as commands. Every group, query and mutation is a command with its own `--help`, so you can read and change your data from a terminal or a script without writing GraphQL.
+kz is the [Management API](/api/management/) as commands. Every group, query and mutation is a command with its own `--help`, so you can read and change your data from a terminal or a script without writing GraphQL.
 
 ## Install
 

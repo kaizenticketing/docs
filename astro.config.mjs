@@ -1,12 +1,27 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
-import { writeApiReference } from "./scripts/api-reference.mjs";
+import fs from "node:fs";
+import { runGraphQLMarkdown } from "@graphql-markdown/cli";
 
 export default defineConfig({
 	site: "https://docs.ktckts.com",
 	integrations: [
-		// the Management API reference is generated from schema/management.json before starlight reads the pages
-		{ name: "api-reference", hooks: { "astro:config:setup": () => writeApiReference() } },
+		// GraphQL-Markdown writes the Management API reference (graphql.config.mjs) before starlight reads the pages; until a
+		// release has written schema/management.json, the reference is its overview alone
+		{
+			name: "management-api-reference",
+			hooks: {
+				"astro:config:setup": async () => {
+					fs.rmSync("./src/content/docs/api/management", { recursive: true, force: true });
+					if (fs.existsSync("./schema/management.json")) {
+						await runGraphQLMarkdown({ id: "default" }, { force: true });
+					} else {
+						fs.mkdirSync("./src/content/docs/api/management", { recursive: true });
+						fs.copyFileSync("./src/api/management/index.md", "./src/content/docs/api/management/index.md");
+					}
+				},
+			},
+		},
 		starlight({
 			title: "Kaizen Ticketing",
 			description: "Guides for partners who integrate with the Kaizen Ticketing platform.",
@@ -39,12 +54,17 @@ export default defineConfig({
 				{ label: "Datafeeds", link: "/datafeeds/" },
 				{ label: "Scheduled Exports", link: "/scheduled-exports/" },
 				{
-					label: "Management API",
+					label: "API",
 					items: [
-						{ label: "Overview", link: "/management-api/" },
-						{ label: "kz", link: "/kz/" },
-						{ label: "Groups", items: [{ autogenerate: { directory: "management-api/groups" } }] },
-						{ label: "Types", collapsed: true, items: [{ autogenerate: { directory: "management-api/types" } }] },
+						{
+							label: "Management",
+							items: [
+								{ label: "Overview", link: "/api/management/" },
+								{ label: "kz", link: "/kz/" },
+								{ label: "Operations", collapsed: true, items: [{ autogenerate: { directory: "api/management/operations" } }] },
+								{ label: "Types", collapsed: true, items: [{ autogenerate: { directory: "api/management/types" } }] },
+							],
+						},
 					],
 				},
 			],
