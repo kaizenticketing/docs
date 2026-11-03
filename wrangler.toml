@@ -4,6 +4,10 @@ compatibility_date = "2026-02-09"
 [assets]
 directory = "./dist"
 
+# a pull request's build deploys with `wrangler preview`, which needs this block - it can be empty, as the
+# .. assets and compatibility settings above apply to a preview too
+[previews]
+
 [[routes]]
 pattern = "docs.ktckts.com"
 custom_domain = true
