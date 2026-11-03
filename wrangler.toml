@@ -1,5 +1,7 @@
 name = "docs"
 compatibility_date = "2026-02-09"
+# a pull request's preview is served on workers.dev - `wrangler deploy` applies this, so it takes effect from main
+preview_urls = true
 
 [assets]
 directory = "./dist"
