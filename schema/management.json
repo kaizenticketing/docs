@@ -42691,18 +42691,6 @@
 								"deprecationReason": null
 							},
 							{
-								"name": "includeInactive",
-								"description": "Include inactive organisations. Kaizen users only; false by default.",
-								"type": {
-									"kind": "SCALAR",
-									"name": "Boolean",
-									"ofType": null
-								},
-								"defaultValue": null,
-								"isDeprecated": false,
-								"deprecationReason": null
-							},
-							{
 								"name": "linkType",
 								"description": "The kind of link to follow. Omitted: the acting organisation alone. Ignored for a Kaizen user.",
 								"type": {
