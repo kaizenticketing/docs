@@ -18,7 +18,7 @@ On Debian, Ubuntu and WSL, add the repository and its key once:
 ```bash
 curl -fsSL https://europe-west2-apt.pkg.dev/doc/repo-signing-key.gpg \
   | sudo gpg --dearmor --output /usr/share/keyrings/kz-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/kz-archive-keyring.gpg] https://europe-west2-apt.pkg.dev/projects/ticketing-shared kz-apt main" \
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/kz-archive-keyring.gpg] https://europe-west2-apt.pkg.dev/projects/ticketing-shared apt-public main" \
   | sudo tee /etc/apt/sources.list.d/kz.list
 sudo apt-get update && sudo apt-get install kz
 ```
