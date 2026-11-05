@@ -27,13 +27,13 @@ Once a day kz checks that it is as new as the platform, and tells you how to upd
 
 ## Sign in
 
-kz sends every request with an access token, and keeps it in your own configuration folder:
-
 ```bash
-kz config set environment prod
-kz auth login --token <token>
+kz auth login                # in your browser
+kz auth login --no-browser   # on a machine with no browser - over SSH, in a container
 kz auth status
 ```
+
+`kz auth login` opens the box office's sign-in page in your browser, and you sign in as yourself. kz keeps the sign-in in your own configuration folder and renews it before it expires. With `--no-browser`, kz prints the sign-in address instead: open it in a browser on any machine, sign in, then paste back the whole address of the page the browser cannot open.
 
 How your software gets a token of its own is not published yet - ask your Kaizen contact.
 
