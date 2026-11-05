@@ -50,8 +50,8 @@ kz venues list
 
 - `--help` on any command lists its flags, and the fields of what it returns.
 - A terminal gets a table; anything else gets JSON. `--format json`, `table`, `csv` or `value(code,name)` chooses.
-- `--fields` adds fields to what is shown, as dotted paths; `--full` shows every object one level down.
-- A list returns a page. `--limit` sets its size, `--page-token` continues from the token kz printed, and `--all` fetches every page.
+- `--fields` shows only the fields it names, as dotted paths (`--fields name,venue.name`); `--full` shows every object one level down.
+- A list returns one page, and prints a token when more follow. `--page-token` continues from that token, `--all` fetches every page, and `--limit 10` fetches at most 10 in all.
 
 ## Changes
 
