@@ -25,3 +25,10 @@
 h1, h2, h3, h4, .site-title {
 	font-weight: 800;
 }
+
+/* graphql-markdown puts each argument, field and enum value in an h4, which starlight sizes as a section heading -
+   keep those at body size so a page of them reads as a list */
+.sl-markdown-content h4:has(.gqlmd-mdx-entity) {
+	font-size: var(--sl-text-base);
+	font-weight: 600;
+}

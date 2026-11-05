@@ -1,9 +1,27 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import fs from "node:fs";
+import { runGraphQLMarkdown } from "@graphql-markdown/cli";
 
 export default defineConfig({
 	site: "https://docs.ktckts.com",
 	integrations: [
+		// GraphQL-Markdown writes the Management API reference (graphql.config.mjs) before starlight reads the pages; until a
+		// release has written schema/management.json, the reference is its overview alone
+		{
+			name: "management-api-reference",
+			hooks: {
+				"astro:config:setup": async () => {
+					fs.rmSync("./src/content/docs/api/management", { recursive: true, force: true });
+					if (fs.existsSync("./schema/management.json")) {
+						await runGraphQLMarkdown({ id: "default" }, { force: true });
+					} else {
+						fs.mkdirSync("./src/content/docs/api/management", { recursive: true });
+						fs.copyFileSync("./src/api/management/index.md", "./src/content/docs/api/management/index.md");
+					}
+				},
+			},
+		},
 		starlight({
 			title: "Kaizen Ticketing",
 			description: "Guides for partners who integrate with the Kaizen Ticketing platform.",
@@ -35,6 +53,20 @@ export default defineConfig({
 			sidebar: [
 				{ label: "Datafeeds", link: "/datafeeds/" },
 				{ label: "Scheduled Exports", link: "/scheduled-exports/" },
+				{
+					label: "API",
+					items: [
+						{
+							label: "Management",
+							items: [
+								{ label: "Overview", link: "/api/management/" },
+								{ label: "kz", link: "/kz/" },
+								{ label: "Operations", collapsed: true, items: [{ autogenerate: { directory: "api/management/operations" } }] },
+								{ label: "Types", collapsed: true, items: [{ autogenerate: { directory: "api/management/types" } }] },
+							],
+						},
+					],
+				},
 			],
 		}),
 	],
