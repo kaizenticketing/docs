@@ -14,9 +14,13 @@
 	},
 	"dependencies": {
 		"@astrojs/starlight": "^0.41.7",
+		"@graphql-markdown/cli": "1.2.0",
+		"@graphql-markdown/formatters": "1.2.0",
 		"astro": "^7.2.2"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": ["esbuild"]
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
 	}
 }
