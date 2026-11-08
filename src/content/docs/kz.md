@@ -11,7 +11,7 @@ kz is the [Management API](/api/management/) as commands. Every group, query and
 | :--- | :--- | :--- |
 | macOS, Apple silicon | `brew tap kaizenticketing/kz https://github.com/kaizenticketing/homebrew`, then `brew install kaizenticketing/kz/kz` | `brew upgrade kz` |
 | Linux, x64 or arm64 | the apt repository, below | `sudo apt-get update && sudo apt-get install --only-upgrade kz` |
-| Windows, x64 | `winget install --id KaizenTicketing.kz` | `winget upgrade --id KaizenTicketing.kz` |
+| Windows, x64 | the archive, below | the same, with the new version |
 
 On Debian, Ubuntu and WSL, add the repository and its key once:
 
@@ -21,6 +21,16 @@ curl -fsSL https://europe-west2-apt.pkg.dev/doc/repo-signing-key.gpg \
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/kz-archive-keyring.gpg] https://europe-west2-apt.pkg.dev/projects/ticketing-shared apt-public main" \
   | sudo tee /etc/apt/sources.list.d/kz.list
 sudo apt-get update && sudo apt-get install kz
+```
+
+On Windows, download the archive and unpack it. Replace `X.Y.Z` with the version you want:
+
+```powershell
+$version = "X.Y.Z"
+$url = "https://artifactregistry.googleapis.com/download/v1/projects/ticketing-shared/locations/europe-west2/repositories/binaries-public/files/kz:${version}:kz-${version}-win-x64.zip:download?alt=media"
+Invoke-WebRequest $url -OutFile kz.zip
+Expand-Archive kz.zip -DestinationPath "$env:LOCALAPPDATA\Programs\kz" -Force
+# then add %LOCALAPPDATA%\Programs\kz to your PATH
 ```
 
 Once a day kz checks that it is as new as the platform, and tells you how to update when it is not.
