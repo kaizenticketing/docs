@@ -1,6 +1,8 @@
 ---
-title: Box Office Roles
+title: Box Office Roles and Permissions
 description: The box office roles, the menus each one sees and what it can do in each.
+sidebar:
+  order: 3
 ---
 
 Each role below lists the menus it sees and what it can do in each. Anything not listed is hidden for that role.
@@ -35,7 +37,7 @@ Only the Kaizen User role (KZ) has these:
 - An organisation's code, name, short name and timezone, activating organisations, and channels
 - Shown only to Kaizen users for now, although TM and SUP hold the permission: venues, attractions, fees & discounts, document templates, and unlocking inventory from report results
 
-## KZ - Kaizen User
+## <span class="role">KZ - Kaizen User</span>
 
 *Everything a Super User has, plus every Kaizen-only feature. Only the Kaizen organisation can grant this role.*
 
@@ -113,7 +115,7 @@ Only the Kaizen User role (KZ) has these:
 
 **Does not see:** Organisation settings (a Kaizen user manages organisations from Administration)
 
-## TM - Ticketing Manager
+## <span class="role">TM - Ticketing Manager</span>
 
 *Should see and do almost everything a club can.*
 
@@ -249,7 +251,7 @@ Only the Kaizen User role (KZ) has these:
 
 **Does not see:** -
 
-## SUP - Supervisor
+## <span class="role">SUP - Supervisor</span>
 
 *Like TM but no payouts, payment/delivery admin, entitlements, rule groups, quotas.*
 
@@ -372,7 +374,7 @@ Only the Kaizen User role (KZ) has these:
 
 **Does not see:** -
 
-## FIN - Finance
+## <span class="role">FIN - Finance</span>
 
 *Reports + balances, no selling.*
 
@@ -422,7 +424,7 @@ Only the Kaizen User role (KZ) has these:
 
 **Does not see:** Venues, Fan Engagement, Automation, Support
 
-## MRK - Marketing
+## <span class="role">MRK - Marketing</span>
 
 *Customers, tags, campaigns, batches - no selling.*
 
@@ -476,7 +478,7 @@ Only the Kaizen User role (KZ) has these:
 
 **Does not see:** Customer orders, Venues, Workstation, Support
 
-## MC - Media / Content
+## <span class="role">MC - Media / Content</span>
 
 *Content: brands, product categories, templates, seat maps.*
 
@@ -495,7 +497,7 @@ Only the Kaizen User role (KZ) has these:
 
 **Does not see:** Home / Analytics, Customers menu, Customer account, Customer orders, Products, Reporting, Fan Engagement, Automation, Workstation, Support
 
-## WS - Window Seller
+## <span class="role">WS - Window Seller</span>
 
 *Till user: sell, reprint, cancel - no admin.*
 
@@ -549,7 +551,7 @@ Only the Kaizen User role (KZ) has these:
 
 **Does not see:** Venues, Fan Engagement, Automation, Organisation, Support
 
-## EXEC - Executive
+## <span class="role">EXEC - Executive</span>
 
 *Read-only: analytics + reports.*
 
@@ -575,7 +577,7 @@ Only the Kaizen User role (KZ) has these:
 
 **Does not see:** Selling, Customers menu, Customer account, Customer orders, Products, Venues, Fan Engagement, Automation, Workstation, Support
 
-## IT - IT / Administrator
+## <span class="role">IT - IT / Administrator</span>
 
 *Automation, templates, workstation - no customers or sales.*
 

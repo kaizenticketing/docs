@@ -32,3 +32,9 @@ h1, h2, h3, h4, .site-title {
 	font-size: var(--sl-text-base);
 	font-weight: 600;
 }
+
+/* on Box Office Roles and Permissions, each role's heading takes the accent colour so it stands apart from the
+   menu headings under it */
+.sl-markdown-content .role {
+	color: var(--sl-color-accent);
+}
