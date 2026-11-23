@@ -32,3 +32,26 @@ h1, h2, h3, h4, .site-title {
 	font-size: var(--sl-text-base);
 	font-weight: 600;
 }
+
+/* on Box Office Roles and Permissions, each role's heading takes the accent colour so it stands apart from the
+   menu headings under it */
+.sl-markdown-content .role {
+	color: var(--sl-color-accent);
+}
+
+/* a card whose icon starlight does not have puts its own svg in the title (see the User Management card on the home
+   page) - lay it out and frame it the way starlight's Card does its built-in icons */
+.card .title > span:has(> .card-icon) {
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+}
+.card .card-icon {
+	width: 1.333em;
+	height: 1.333em;
+	border: 1px solid var(--sl-card-border);
+	background-color: var(--sl-card-bg);
+	padding: 0.2em;
+	border-radius: 0.25rem;
+	flex-shrink: 0;
+}

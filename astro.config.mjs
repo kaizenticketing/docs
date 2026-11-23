@@ -53,6 +53,8 @@ export default defineConfig({
 			sidebar: [
 				{ label: "Datafeeds", link: "/datafeeds/" },
 				{ label: "Scheduled Exports", link: "/scheduled-exports/" },
+				// every page in src/content/docs/user-management is listed here; set sidebar.order in a page's frontmatter to place it
+				{ label: "User Management", items: [{ autogenerate: { directory: "user-management" } }] },
 				{
 					label: "API",
 					items: [
