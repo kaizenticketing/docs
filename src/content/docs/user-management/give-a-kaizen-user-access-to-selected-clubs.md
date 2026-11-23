@@ -2,7 +2,7 @@
 title: Give a Kaizen user access to selected clubs
 description: How to give a user in the Kaizen organisation access to selected clubs only, instead of every organisation.
 sidebar:
-  order: 2
+  order: 3
 ---
 
 Users in the Kaizen organisation (Root) with a KZ or SU role have access to every organisation. To give a user in the Kaizen organisation access to selected clubs only:

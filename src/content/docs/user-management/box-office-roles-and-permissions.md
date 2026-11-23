@@ -2,7 +2,7 @@
 title: Box Office Roles and Permissions
 description: The box office roles, the menus each one sees and what it can do in each.
 sidebar:
-  order: 3
+  order: 2
 ---
 
 Each role below lists the menus it sees and what it can do in each. Anything not listed is hidden for that role.
