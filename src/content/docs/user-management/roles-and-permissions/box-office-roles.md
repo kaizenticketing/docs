@@ -7,21 +7,9 @@ Each role below lists the menus it sees and what it can do in each. Anything not
 
 A user with more than one role gets everything from all of them. A user with no role sees nothing.
 
-## Kaizen users - roles and clubs
+## Kaizen users
 
-Users in the Kaizen organisation (Root) with a KZ or SU role have access to every organisation.
-
-You can also give a user in the Kaizen organisation access to selected clubs only:
-
-1. Make sure the user is in the Kaizen organisation with no role in the Kaizen organisation.
-2. Go to the club's organisation and select **Role Assignments** from the tabs.
-3. Click **New** in the top right corner, and on that screen click **click here** to assign a role to a user from another organisation.
-
-   ![Assigning a role to a user from another organisation](/user-management/assign-role-from-another-organisation.png)
-
-4. Select the ticketing project, press **Next**, and select the role you want.
-
-This gives access to that organisation only. A role in a second club gives access to that club too, and the permissions of both roles apply in both clubs.
+Users in the Kaizen organisation (Root) with a KZ or SU role have access to every organisation. To limit a Kaizen user to selected clubs, see [Give a Kaizen user access to selected clubs](/user-management/give-a-kaizen-user-access-to-selected-clubs/).
 
 **Kaizen User (KZ)** can do everything a club can, plus the Kaizen-only features below.
 
@@ -113,7 +101,7 @@ Only the Kaizen User role (KZ) has these:
 ### Integrations, User Management and Administration
 
 - CRM, access control and webhook integrations
-- User Management (the Kaizen auth console)
+- User Management
 - Activate and deactivate organisations
 - Payment providers, sender configurations, tracking analytics, tax bands and countries
 - Republish entities and flush the cache

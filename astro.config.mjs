@@ -53,11 +53,15 @@ export default defineConfig({
 			sidebar: [
 				{ label: "Datafeeds", link: "/datafeeds/" },
 				{ label: "Scheduled Exports", link: "/scheduled-exports/" },
-				// each subgroup lists every page in its folder; set sidebar.order in a page's frontmatter to place it
+				// a new page under user-management needs its own line here; Roles and Permissions lists every page in its folder
 				{
 					label: "User Management",
 					items: [
-						{ label: "Overview", link: "/user-management/" },
+						"user-management/create-a-user",
+						"user-management/sign-in-for-the-first-time",
+						"user-management/give-a-user-a-role",
+						"user-management/give-a-kaizen-user-access-to-selected-clubs",
+						"user-management/reset-a-password-or-deactivate-a-user",
 						{
 							label: "Roles and Permissions",
 							items: [{ autogenerate: { directory: "user-management/roles-and-permissions" } }],
