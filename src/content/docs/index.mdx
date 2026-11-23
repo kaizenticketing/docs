@@ -21,9 +21,6 @@ hero:
 
 import { Card, CardGrid } from "@astrojs/starlight/components";
 
-{/* starlight has no person icon, so User Management carries Unicons' "user", the family starlight's own icons come from */}
-export const userIcon = '<svg class="card-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.71 12.71a6 6 0 1 0-7.42 0 10 10 0 0 0-6.22 8.18 1 1 0 0 0 2 .22 8 8 0 0 1 15.9 0 1 1 0 0 0 1 .89h.11a1 1 0 0 0 .88-1.1 10 10 0 0 0-6.25-8.19ZM12 12a4 4 0 1 1 4-4 4 4 0 0 1-4 4Z"/></svg>';
-
 <CardGrid>
 	<Card title="Datafeeds" icon="rocket">
 		A near-real-time outbound feed of changes. When things change in Kaizen, we
@@ -43,12 +40,6 @@ export const userIcon = '<svg class="card-icon" aria-hidden="true" width="16" he
 		type, and kz, the same API as commands.
 
 		[Read the Management API reference →](/api/management/)
-	</Card>
-	<Card title={`${userIcon}<span>User Management</span>`}>
-		Create and look after box office users, give Kaizen users access to
-		selected clubs, and see what each role can see and do.
-
-		[Read the User Management guide →](/user-management/managing-users/)
 	</Card>
 </CardGrid>
 
